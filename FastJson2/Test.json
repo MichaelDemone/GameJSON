@@ -1,0 +1,30 @@
+{
+	"DoubleValueProperty0" : 142.010,
+	"ValueProperty1": "142.010",
+	"ValueProperty2": "142",
+	"DoubleValueProperty3": 0.00000123,
+	"DoubleValueProperty4": 14.452E-23,
+	"DoubleValueProperty5": 14.452E+23,
+	"DoubleValueProperty6": 14.452E23,
+	"DoubleValueProperty7": 14.452e-23,
+	"DoubleValueProperty8": 14.452e+23,
+	"DoubleValueProperty9": 14.452e23,
+	"BoolProperty10": true,
+	"BoolProperty11": false,
+	"ArrayProperty1": [
+		"Object",
+		132,
+		{
+			"InAnArray": true
+		},
+		{
+			"InAnArrayToo": true
+		}
+	],
+	"ObjectProperty1": {
+		"MyNestedObject": {
+			"InNestedObject?" : true
+		}
+	},
+	"ObjectProperty2": null
+}
