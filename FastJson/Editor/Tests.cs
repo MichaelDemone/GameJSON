@@ -371,6 +371,74 @@ namespace FastJson
             {
                 public T InstanceOfThing;
             }
+
+            [Test]
+            public void CustomSerializer()
+            {
+                Vector3 v3 = new Vector3();
+                v3.x = 1;
+                v3.y = 2;
+                v3.z = 3;
+                string s = EasyJSON.Serialize(v3);
+                Print($"Pre converter {s}");
+                string s2 = EasyJSON.Serialize(v3, new Dictionary<Type, IJSONSerialize>()
+                {
+                    {typeof(Vector3), new Vector3Serializer() }
+                });
+                Print($"Post converter {s2}");
+                Assert(s != s2, "Custom serializer did not change output");
+            }
+
+            [Test]
+            public void CustomDeserializer()
+            {
+                Vector3 v3 = new Vector3();
+                v3.x = 1;
+                v3.y = 2;
+                v3.z = 3;
+                string s2 = EasyJSON.Serialize(v3, new Dictionary<Type, IJSONSerialize>()
+                {
+                    {typeof(Vector3), new Vector3Serializer() }
+                });
+
+                Vector3 v3_deserialize = EasyJSON.Deserialize<Vector3>(s2, new Dictionary<Type, IJSONDeserialize>()
+                {
+                    {typeof(Vector3), new Vector3Serializer() }
+                });
+                Assert(v3 == v3_deserialize, "Vectors must be equal");
+            }
+
+            private class Vector3Serializer : IJSONSerialize, IJSONDeserialize
+            {
+                public object Deserialize(FastJSONReader reader, Dictionary<Type, IJSONDeserialize> customDeserializers)
+                {
+                    Vector3 val = new Vector3();
+                    reader.ExpectArrayStart();
+                    {
+                        val.x = (float) reader.ConsumeDoubleValue();
+                        val.y = (float) reader.ConsumeDoubleValue();
+                        val.z = (float)reader.ConsumeDoubleValue();
+                    }
+                    reader.ExpectArrayEnd();
+
+                    return val;
+                }
+
+                public void Serialize(object value, FastJSONWriter writer, Dictionary<Type, IJSONSerialize> customSerializers)
+                {
+                    Vector3 vval = (Vector3)value;
+                    writer.BeginArray();
+                    {
+                        writer.WriteArrayValue(vval.x);
+                        writer.WriteArrayValue(vval.y);
+                        writer.WriteArrayValue(vval.z);
+                    }
+                    writer.EndArray();
+                }
+
+
+            }
+
         }
 
         private static void Assert(bool assertion, string message) {

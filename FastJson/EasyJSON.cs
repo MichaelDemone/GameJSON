@@ -4,20 +4,34 @@ using System.Collections.Generic;
 
 namespace FastJson
 {
+    public interface IJSONSerialize
+    {
+        public void Serialize(object value, FastJSONWriter writer, Dictionary<Type, IJSONSerialize> customSerializers);
+    }
+
+    public interface IJSONDeserialize
+    {
+        public object Deserialize(FastJSONReader reader, Dictionary<Type, IJSONDeserialize> customDeserializers);
+    }
+
     public class EasyJSON 
     {
-        public static string Serialize(object obj)
+        public static string Serialize(object obj, Dictionary<Type, IJSONSerialize> customSerializers = null)
         {
             FastJson.FastJSONWriter writer = new FastJson.FastJSONWriter();
-            Serialize(obj, writer);
+            Serialize(obj, writer, customSerializers);
             return writer.GetJSON();
         }
 
-        public static void Serialize(object objVal, FastJSONWriter writer) {
+        public static void Serialize(object objVal, FastJSONWriter writer, Dictionary<Type, IJSONSerialize> customSerializers = null) {
 
             if(objVal == null) 
             {
                 writer.RawWrite("null");
+            }
+            else if (customSerializers != null && customSerializers.TryGetValue(objVal.GetType(), out var serializer))
+            {
+                serializer.Serialize(objVal, writer, customSerializers);
             }
             else if (objVal is bool bo) 
             {
@@ -76,7 +90,7 @@ namespace FastJson
                 {
                     foreach(var val in enumer) {
                         writer.StartArrayValue();
-                        Serialize(val, writer);
+                        Serialize(val, writer, customSerializers);
                         writer.EndArrayValue();
                     }
                 }
@@ -92,7 +106,7 @@ namespace FastJson
                         object fieldVal = field.GetValue(objVal);
                         writer.BeginProperty(name);
                         {
-                            Serialize(fieldVal, writer);
+                            Serialize(fieldVal, writer, customSerializers);
                         }
                         writer.EndProperty();
                     }
@@ -101,21 +115,25 @@ namespace FastJson
             }
         }
     
-        public static T Deserialize<T>(string s) {
+        public static T Deserialize<T>(string s, Dictionary<Type, IJSONDeserialize> customDeserializers = null) {
             FastJSONReader reader = new FastJSONReader(s);
-            return (T) Deserialize(typeof(T), reader);
+            return (T) Deserialize(typeof(T), reader, customDeserializers);
         }
 
         private static readonly Type[] EmptyType = new Type[0];
         private static readonly object[] EmptyParamArray = new object[0];
 
-        public static object Deserialize(Type ttype, FastJSONReader reader) {
+        public static object Deserialize(Type ttype, FastJSONReader reader, Dictionary<Type, IJSONDeserialize> customDeserializers = null) {
 
-            if(reader.IsNullToken()) {
+            if (customDeserializers != null && customDeserializers.TryGetValue(ttype, out var customDeserializer))
+            {
+                return customDeserializer.Deserialize(reader, customDeserializers);
+            }
+            else if (reader.IsNullToken()) {
                 reader.ConsumeNull();
                 return null;
             }
-            if (ttype == typeof(bool)) {
+            else if (ttype == typeof(bool)) {
                 return reader.ConsumeBoolValue();
             }
             else if (ttype == typeof(string)) {
