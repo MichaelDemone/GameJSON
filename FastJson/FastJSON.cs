@@ -257,10 +257,12 @@ namespace FastJson
 
         public int GetArrayLength() {
             int length = 0;
+            int originalPosition = Position;
             while(!IsAtArrayEnd()) {
                 ConsumeUnknownValue();
                 length++;
             }
+            Position = originalPosition;
             return length;
         }
 
@@ -497,6 +499,7 @@ namespace FastJson
             Add(s);
         }
 
+
         public void RawWrite(bool b) {
             Add(b ? "true" : "false");
         }
@@ -528,7 +531,7 @@ namespace FastJson
         }
     }
 
-    static class InPlaceParsing
+    public static class InPlaceParsing
     {
         public static double ParseDouble(string toParse, int start, int length)
         {

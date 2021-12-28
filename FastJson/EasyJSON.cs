@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace FastJson
 {
@@ -23,7 +24,9 @@ namespace FastJson
                 writer.RawWrite(bo);
             }
             else if (objVal is string str) {
+                writer.RawWrite("\"");
                 writer.RawWrite(str);
+                writer.RawWrite("\"");
             }
             else if (objVal is DateTime dt) {
                 writer.RawWrite(dt.ToString());
@@ -105,6 +108,9 @@ namespace FastJson
             return (T) Deserialize(typeof(T), reader);
         }
 
+        private static readonly Type[] EmptyType = new Type[0];
+        private static readonly object[] EmptyParamArray = new object[0];
+
         public static object Deserialize(Type ttype, FastJSONReader reader) {
 
             if(reader.IsNullToken()) {
@@ -137,16 +143,9 @@ namespace FastJson
                 return (decimal) reader.ConsumeDoubleValue();
             }
             else {
-                Type listType = ttype.GetInterface(nameof(IList)+"'1");
-                if (ttype.IsArray || listType != null) {
-                    
-                    Type elementType;
-                    if(ttype.IsArray) {
-                        elementType = ttype.GetElementType();
-                    } 
-                    else {
-                        elementType = listType.GetGenericArguments()[0];
-                    }
+                Type listType = ttype.GetInterface(typeof(IList<>).Name);
+                if (ttype.IsArray) {
+                    Type elementType = ttype.GetElementType();
 
                     reader.ExpectArrayStart();
                     var array = Array.CreateInstance(elementType, reader.GetArrayLength());
@@ -158,7 +157,25 @@ namespace FastJson
                         }
                     }
                     reader.ExpectArrayEnd();
+
                     return array;
+                }
+                else if (listType != null)
+                {
+                    Type elementType = listType.GetGenericArguments()[0];
+                    var constructor = ttype.GetConstructor(EmptyType);
+                    IList result = (IList) constructor.Invoke(EmptyParamArray);
+
+                    reader.ExpectArrayStart();
+                    {
+                        for (int i = 0; !reader.IsAtArrayEnd(); i++)
+                        {
+                            var deserializedArrayObject = Deserialize(elementType, reader);
+                            result.Add(deserializedArrayObject);
+                        }
+                    }
+                    reader.ExpectArrayEnd();
+                    return result;
                 }
                 else {
                     object result = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(ttype);
