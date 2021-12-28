@@ -70,7 +70,7 @@ namespace FastJson
             else if (objVal is ushort us) {
                 writer.RawWrite((double) us);
             }
-            else if (objVal is IEnumerable enumer) 
+            else if (objVal is IList enumer) 
             {
                 writer.BeginArray();
                 {
@@ -120,9 +120,6 @@ namespace FastJson
             }
             else if (ttype == typeof(string)) {
                 return reader.ConsumeStringValue();
-            }
-            else if (ttype == typeof(DateTime)) {
-                return reader.ConsumeDateTime();
             }
             else if (ttype == typeof(byte))     return (byte)   reader.ConsumeDoubleValue();
             else if (ttype == typeof(sbyte))    return (sbyte)  reader.ConsumeDoubleValue();

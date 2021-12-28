@@ -163,11 +163,6 @@ namespace FastJson
             return c;
         }
 
-        public DateTime ConsumeDateTime() 
-        {
-            throw new NotImplementedException();
-        }
-
         #region Consume Unknowns
         public void ConsumeUnknownValue()
         {
