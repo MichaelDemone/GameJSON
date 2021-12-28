@@ -24,9 +24,7 @@ namespace FastJson
                 writer.RawWrite(bo);
             }
             else if (objVal is string str) {
-                writer.RawWrite("\"");
-                writer.RawWrite(str);
-                writer.RawWrite("\"");
+                writer.RawWriteEscapedString(str);
             }
             else if (objVal is DateTime dt) {
                 writer.RawWrite(dt.ToString());
@@ -164,14 +162,17 @@ namespace FastJson
                 {
                     Type elementType = listType.GetGenericArguments()[0];
                     var constructor = ttype.GetConstructor(EmptyType);
-                    IList result = (IList) constructor.Invoke(EmptyParamArray);
+                    object result = constructor.Invoke(EmptyParamArray);
+                    var addMethod = ttype.GetMethod("Add", new Type[] { elementType });
 
                     reader.ExpectArrayStart();
                     {
+                        object[] param = new object[1];
                         for (int i = 0; !reader.IsAtArrayEnd(); i++)
                         {
                             var deserializedArrayObject = Deserialize(elementType, reader);
-                            result.Add(deserializedArrayObject);
+                            param[0] = deserializedArrayObject;
+                            addMethod.Invoke(result, param);
                         }
                     }
                     reader.ExpectArrayEnd();

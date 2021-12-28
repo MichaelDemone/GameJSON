@@ -259,7 +259,7 @@ namespace FastJson
             public void StringReflectionTest()
             {
                 TestStruct ts = TestStruct.MakeDefault();
-                string escapeString = "Escape characters lets gooo \"\\ how about \n or maybe \t or how about \r??";
+                string escapeString = "Escape characters lets gooo. NewLine: \n. Quote: \". Slash \\. Backward slash /. Backspace \b. Formfeed \f. carridge return \r. Tab \t.";
                 ts.ValueProperty1 = escapeString;
                 string s = EasyJSON.Serialize(ts);
                 Print(s);

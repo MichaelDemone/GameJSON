@@ -82,23 +82,48 @@ namespace FastJson
             return res;
         }
 
+
+        StringBuilder smallStringBuilder = new StringBuilder();
         public string ConsumeStringValue()
         {
             if(IsNullToken()) {
                 ConsumeNull();
                 return null;
             }
-            int length = 0;
             Expect('"');
-            int start = Position;
-            while(Json[Position] != '"')
+            // TODO(Perf): Could scan array first to figure out its size and then create string rather than reusing string builder.
+            smallStringBuilder.Clear();
+
+            while (Json[Position] != '"')
             {
-                length++;
+                if (Json[Position] == '\\')
+                {
+                    Position++;
+                    if (Json[Position] == '\"')        smallStringBuilder.Append('\"');
+                    else if (Json[Position] == '\\')   smallStringBuilder.Append('\\');
+                    else if (Json[Position] == '/')    smallStringBuilder.Append('/');
+                    else if (Json[Position] == 'b')    smallStringBuilder.Append('\b');
+                    else if (Json[Position] == 'f')    smallStringBuilder.Append('\f');
+                    else if (Json[Position] == 'n')    smallStringBuilder.Append('\n');
+                    else if (Json[Position] == 'r')    smallStringBuilder.Append('\r');
+                    else if (Json[Position] == 't')    smallStringBuilder.Append('\t');
+                    //else if Json[Position] == 'u')   smallStringBuilder.Append('\"'); // Don't do hex parsing, not sure what its use case is
+                    else
+                    {
+                        smallStringBuilder.Append('\\');
+                        smallStringBuilder.Append(Json[Position]);
+                    }
+                }
+                else
+                {
+                    smallStringBuilder.Append(Json[Position]);
+                }
+
                 Position++;
             }
             Expect('"');
             Accept(',');
-            return Json.Substring(start, length);
+            return smallStringBuilder.ToString();
         }
 
         public bool ConsumeBoolValue()
@@ -229,13 +254,11 @@ namespace FastJson
 
         public void ConsumeUnknownStringValue()
         {
-            int length = 0;
             Expect('"');
-            int start = Position;
             while(Json[Position] != '"')
             {
-                length++;
                 Position++;
+                if (Json[Position] == '\\') Position++; // Skip escaped character in case it's "
             }
             Expect('"');
             Accept(',');
@@ -427,7 +450,7 @@ namespace FastJson
         {
             StartArrayValue();
             Add('"');
-            Add(value);
+            AddEscaped(value);
             Add('"');
             EndArrayValue();
         }
@@ -456,7 +479,7 @@ namespace FastJson
         {
             BeginProperty(name);
             Add('"');
-            Add(value); 
+            AddEscaped(value); 
             Add('"');
             EndProperty();
         }
@@ -466,7 +489,7 @@ namespace FastJson
         
         public void WritePropertyRawString(string name, string value) {
             BeginProperty(name);
-            Add(value);
+            AddEscaped(value);
             EndProperty();
         }
 
@@ -499,6 +522,12 @@ namespace FastJson
             Add(s);
         }
 
+        public void RawWriteEscapedString(string s)
+        {
+            Add('"');
+            AddEscaped(s);
+            Add('"');
+        }
 
         public void RawWrite(bool b) {
             Add(b ? "true" : "false");
@@ -528,6 +557,30 @@ namespace FastJson
         private void Add(string s) 
         {
             sb.Append(s);
+        }
+
+        private void AddEscaped(string s)
+        {
+            void Escape(char c)
+            {
+                sb.Append('\\');
+                sb.Append(c);
+            }
+            for(int i = 0; i < s.Length; i++)
+            {
+                if (s[i] == '\\') Escape('\\');
+                else if (s[i] == '"') Escape('"');
+                else if (s[i] == '/') Escape('/');
+                else if (s[i] == '\b') Escape('b');
+                else if (s[i] == '\f') Escape('f');
+                else if (s[i] == '\n') Escape('n');
+                else if (s[i] == '\r') Escape('r');
+                else if (s[i] == '\t') Escape('t');
+                else
+                {
+                    sb.Append(s[i]);
+                }
+            }
         }
     }
 
