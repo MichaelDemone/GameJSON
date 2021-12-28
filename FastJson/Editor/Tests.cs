@@ -354,6 +354,23 @@ namespace FastJson
                     Assert(deserializeRes.ListOfNestedConcreteClass[i].MyString == ts.ListOfNestedConcreteClass[i].MyString, "Did not properly deserialize");
                 }
             }
+
+            [Test]
+            public void GenericReflectionTest()
+            {
+                var ds = new GenericAsHeck<TestStruct>();
+                ds.InstanceOfThing = TestStruct.MakeDefault();
+                ds.InstanceOfThing.BoolProperty11 = true;
+                string s = EasyJSON.Serialize(ds);
+                Print(s);
+                var deserializeRes = EasyJSON.Deserialize<GenericAsHeck<TestStruct>>(s);
+                Assert(deserializeRes.InstanceOfThing.BoolProperty11, "Did not properly deserialize");
+            }
+
+            private class GenericAsHeck<T>
+            {
+                public T InstanceOfThing;
+            }
         }
 
         private static void Assert(bool assertion, string message) {
