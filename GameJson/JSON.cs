@@ -136,7 +136,7 @@ namespace GameJSON.ReflectionParsing
                     foreach (var field in objType.GetFields(settings.FieldFlags))
                     {
                         string name = field.Name;
-                        if(name.Contains("<") && !settings.SerializeAutoPropertyFields)
+                        if(!settings.SerializeAutoPropertyFields && name.Contains("<"))
                         {
                             continue;
                         }
@@ -272,7 +272,7 @@ namespace GameJSON.ReflectionParsing
                         while(!reader.IsAtObjectEnd()) {
                             bool consumed = false;
                             foreach(var field in fields) {
-                                if (field.Name.Contains("<") && !settings.SerializeAutoPropertyFields) continue;
+                                if (!settings.SerializeAutoPropertyFields && field.Name.Contains("<")) continue;
 
                                 if(reader.TryConsumeProperty(field.Name)) {
                                     var fieldValue = Deserialize(field.FieldType, reader);
