@@ -15,7 +15,7 @@ namespace GameJSON.ReflectionParsing
         public object Deserialize(JSONReader reader, IDictionary<Type, IJSONDeserialize> customDeserializers);
     }
 
-    public class EasyJSON 
+    public class JSON
     {
         public static string Serialize(object obj, IDictionary<Type, IJSONSerialize> customSerializers = null)
         {

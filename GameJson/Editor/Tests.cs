@@ -250,9 +250,9 @@ namespace GameJSON
             {
                 TestStruct ts = TestStruct.MakeDefault();
                 ts.BoolProperty10 = true;
-                string s = EasyJSON.Serialize(ts);
+                string s = JSON.Serialize(ts);
                 Print(s);
-                var deserializeRes = EasyJSON.Deserialize<TestStruct>(s);
+                var deserializeRes = JSON.Deserialize<TestStruct>(s);
                 Assert(deserializeRes.BoolProperty10, "Did not properly deserialize");
             }
 
@@ -262,9 +262,9 @@ namespace GameJSON
                 TestStruct ts = TestStruct.MakeDefault();
                 string escapeString = "Escape characters lets gooo. NewLine: \n. Quote: \". Slash \\. Backward slash /. Backspace \b. Formfeed \f. carridge return \r. Tab \t.";
                 ts.ValueProperty1 = escapeString;
-                string s = EasyJSON.Serialize(ts);
+                string s = JSON.Serialize(ts);
                 Print(s);
-                var deserializeRes = EasyJSON.Deserialize<TestStruct>(s);
+                var deserializeRes = JSON.Deserialize<TestStruct>(s);
                 Assert(deserializeRes.ValueProperty1 == ts.ValueProperty1, "Did not properly deserialize");
             }
 
@@ -275,9 +275,9 @@ namespace GameJSON
                 ts.IntArray = new int[10];
                 ts.IntArray[0] = 5;
                 ts.IntArray[8] = 10;
-                string s = EasyJSON.Serialize(ts);
+                string s = JSON.Serialize(ts);
                 Print(s);
-                var deserializeRes = EasyJSON.Deserialize<TestStruct>(s);
+                var deserializeRes = JSON.Deserialize<TestStruct>(s);
                 for (int i = 0; i < ts.IntArray.Length; i++)
                 {
                     Assert(deserializeRes.IntArray[i] == ts.IntArray[i], "Did not properly deserialize");
@@ -292,9 +292,9 @@ namespace GameJSON
                 TestStruct.NestedStruct ns = ts.Structs[0];
                 ns.RandomValue = 1;
                 ts.Structs[0] = ns;
-                string s = EasyJSON.Serialize(ts);
+                string s = JSON.Serialize(ts);
                 Print(s);
-                var deserializeRes = EasyJSON.Deserialize<TestStruct>(s);
+                var deserializeRes = JSON.Deserialize<TestStruct>(s);
                 Assert(deserializeRes.Structs.Length == 10, "Did not properly deserialize");
                 for (int i = 0; i < ts.Structs.Length; i++)
                 {
@@ -310,9 +310,9 @@ namespace GameJSON
                 TestStruct.NestedStruct ns = new TestStruct.NestedStruct();
                 ns.RandomValue = 1;
                 ts.ListOfStructs.Add(ns);
-                string s = EasyJSON.Serialize(ts);
+                string s = JSON.Serialize(ts);
                 Print(s);
-                var deserializeRes = EasyJSON.Deserialize<TestStruct>(s);
+                var deserializeRes = JSON.Deserialize<TestStruct>(s);
                 Assert(deserializeRes.ListOfStructs.Count == 1, "Did not properly deserialize");
                 for (int i = 0; i < ts.ListOfStructs.Count; i++)
                 {
@@ -328,9 +328,9 @@ namespace GameJSON
                 TestStruct.NestedClass nc = new TestStruct.NestedClass();
                 nc.MyString = "TESTSSSSS";
                 ts.NestedConcreteClassArray[0] = nc;
-                string s = EasyJSON.Serialize(ts);
+                string s = JSON.Serialize(ts);
                 Print(s);
-                var deserializeRes = EasyJSON.Deserialize<TestStruct>(s);
+                var deserializeRes = JSON.Deserialize<TestStruct>(s);
                 Assert(deserializeRes.NestedConcreteClassArray[0].MyString == nc.MyString, "Did not properly deserialize");
                 for (int i = 1; i < ts.NestedConcreteClassArray.Length; i++)
                 {
@@ -346,9 +346,9 @@ namespace GameJSON
                 var ns = new TestStruct.NestedClass();
                 ns.MyString = "TEST2";
                 ts.ListOfNestedConcreteClass.Add(ns);
-                string s = EasyJSON.Serialize(ts);
+                string s = JSON.Serialize(ts);
                 Print(s);
-                var deserializeRes = EasyJSON.Deserialize<TestStruct>(s);
+                var deserializeRes = JSON.Deserialize<TestStruct>(s);
                 Assert(deserializeRes.ListOfNestedConcreteClass.Count == 1, "Did not properly deserialize");
                 for (int i = 0; i < ts.ListOfNestedConcreteClass.Count; i++)
                 {
@@ -362,9 +362,9 @@ namespace GameJSON
                 var ds = new GenericAsHeck<TestStruct>();
                 ds.InstanceOfThing = TestStruct.MakeDefault();
                 ds.InstanceOfThing.BoolProperty11 = true;
-                string s = EasyJSON.Serialize(ds);
+                string s = JSON.Serialize(ds);
                 Print(s);
-                var deserializeRes = EasyJSON.Deserialize<GenericAsHeck<TestStruct>>(s);
+                var deserializeRes = JSON.Deserialize<GenericAsHeck<TestStruct>>(s);
                 Assert(deserializeRes.InstanceOfThing.BoolProperty11, "Did not properly deserialize");
             }
 
@@ -380,9 +380,9 @@ namespace GameJSON
                 v3.x = 1;
                 v3.y = 2;
                 v3.z = 3;
-                string s = EasyJSON.Serialize(v3);
+                string s = JSON.Serialize(v3);
                 Print($"Pre converter {s}");
-                string s2 = EasyJSON.Serialize(v3, new Dictionary<Type, IJSONSerialize>()
+                string s2 = JSON.Serialize(v3, new Dictionary<Type, IJSONSerialize>()
                 {
                     {typeof(Vector3), new Vector3Serializer() }
                 });
@@ -397,12 +397,12 @@ namespace GameJSON
                 v3.x = 1;
                 v3.y = 2;
                 v3.z = 3;
-                string s2 = EasyJSON.Serialize(v3, new Dictionary<Type, IJSONSerialize>()
+                string s2 = JSON.Serialize(v3, new Dictionary<Type, IJSONSerialize>()
                 {
                     {typeof(Vector3), new Vector3Serializer() }
                 });
 
-                Vector3 v3_deserialize = EasyJSON.Deserialize<Vector3>(s2, new Dictionary<Type, IJSONDeserialize>()
+                Vector3 v3_deserialize = JSON.Deserialize<Vector3>(s2, new Dictionary<Type, IJSONDeserialize>()
                 {
                     {typeof(Vector3), new Vector3Serializer() }
                 });
