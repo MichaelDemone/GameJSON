@@ -383,6 +383,18 @@ namespace GameJSON.Tests
                 public T InstanceOfThing;
             }
 
+            JSONSettings customSettings = new JSONSettings()
+            {
+                CustomSerializers = new Dictionary<Type, IJSONSerialize>()
+                    {
+                        {typeof(Vector3), new Vector3Serializer() }
+                    },
+                CustomDeserializers = new Dictionary<Type, IJSONDeserialize>()
+                    {
+                        {typeof(Vector3), new Vector3Serializer() }
+                    }
+            };
+
             [Test]
             public void CustomSerializer()
             {
@@ -394,10 +406,7 @@ namespace GameJSON.Tests
                 };
                 string s = JSON.Serialize(v3);
                 Print($"Pre converter {s}");
-                string s2 = JSON.Serialize(v3, new Dictionary<Type, IJSONSerialize>()
-                {
-                    {typeof(Vector3), new Vector3Serializer() }
-                });
+                string s2 = JSON.Serialize(v3, customSettings);
                 Print($"Post converter {s2}");
                 Assert(s != s2, "Custom serializer did not change output");
             }
@@ -411,21 +420,16 @@ namespace GameJSON.Tests
                     y = 2,
                     z = 3
                 };
-                string s2 = JSON.Serialize(v3, new Dictionary<Type, IJSONSerialize>()
-                {
-                    {typeof(Vector3), new Vector3Serializer() }
-                });
 
-                var v3_deserialize = JSON.Deserialize<Vector3>(s2, new Dictionary<Type, IJSONDeserialize>()
-                {
-                    {typeof(Vector3), new Vector3Serializer() }
-                });
+                string s2 = JSON.Serialize(v3, customSettings);
+
+                var v3_deserialize = JSON.Deserialize<Vector3>(s2, customSettings);
                 Assert(v3 == v3_deserialize, "Vectors must be equal");
             }
 
             private class Vector3Serializer : IJSONSerialize, IJSONDeserialize
             {
-                public object Deserialize(JSONReader reader, IDictionary<Type, IJSONDeserialize> customDeserializers)
+                public object Deserialize(JSONReader reader, JSONSettings settings)
                 {
                     var val = new Vector3();
                     reader.ExpectArrayStart();
@@ -439,7 +443,7 @@ namespace GameJSON.Tests
                     return val;
                 }
 
-                public void Serialize(object value, JSONWriter writer, IDictionary<Type, IJSONSerialize> customSerializers)
+                public void Serialize(object value, JSONWriter writer, JSONSettings settings)
                 {
                     var vval = (Vector3)value;
                     writer.BeginArray();
@@ -450,10 +454,90 @@ namespace GameJSON.Tests
                     }
                     writer.EndArray();
                 }
-
-
             }
 
+            public class PropertySerializationTester
+            {
+                public static int StaticGetterProperty { get { return 1; } }
+                public static int StaticSetterProperty { set { } }
+                public static int StaticProperty { get; set; }
+
+                public int InstanceGetterProperty { get { return 1; } }
+                public int InstanceSetterProperty { set { } }
+
+                [SerializeProperty]
+                public int SerializedPropertyProperty { get { return privateProperty; } set { privateProperty = value; } }
+                public int PublicAutoProperty { get; set; }
+                public int PublicAutoGetProperty { get; }
+                private int privateProperty { get; set; }
+            }
+
+            [Test]
+            public void AutoPropertySerializationTest()
+            {
+                var objToSerialize = new PropertySerializationTester()
+                {
+                    PublicAutoProperty = 1,
+                };
+
+                var noAutoSerializeSettings = new JSONSettings()
+                {
+                    SerializeAutoPropertyFields = false
+                };
+
+                string s = JSON.Serialize(objToSerialize);
+                string s2 = JSON.Serialize(objToSerialize, noAutoSerializeSettings);
+
+                Print($"With auto props\n{s}");
+                Print($"Without auto props\n{s2}");
+
+                var res = JSON.Deserialize<PropertySerializationTester>(s);
+                Assert(res.PublicAutoProperty == objToSerialize.PublicAutoProperty, "Auto property not set properly");
+
+                var res2 = JSON.Deserialize<PropertySerializationTester>(s, noAutoSerializeSettings);
+                Assert(res2.PublicAutoProperty != objToSerialize.PublicAutoProperty, $"Auto property set when it shouldn't have been. Res2: {res.PublicAutoProperty}");
+
+                var res3 = JSON.Deserialize<PropertySerializationTester>(s2, noAutoSerializeSettings);
+                Assert(res3.PublicAutoProperty != objToSerialize.PublicAutoProperty, $"Auto properties set when it shouldn't have been. Res3: {res.PublicAutoProperty}");
+            }
+
+            [Test]
+            public void PropertyTagSerializationTest()
+            {
+                var objToSerialize = new PropertySerializationTester()
+                {
+                    SerializedPropertyProperty = 1,
+                };
+
+                var dontSerializeAuto = new JSONSettings()
+                {
+                    SerializeAutoPropertyFields = false
+                };
+
+                var serializeWithTags = new JSONSettings()
+                {
+                    AttemptToSerializePropertiesWithTag = true,
+                    SerializeAutoPropertyFields = false
+                };
+
+                string serializedWithoutProp = JSON.Serialize(objToSerialize, dontSerializeAuto);
+                string serializedWithProp = JSON.Serialize(objToSerialize, serializeWithTags);
+
+                Print($"Without serialization tag\n{serializedWithoutProp}");
+                Print($"With serialization tag\n{serializedWithProp}");
+
+                var shouldntSerialize = JSON.Deserialize<PropertySerializationTester>(serializedWithoutProp);
+                Assert(shouldntSerialize.SerializedPropertyProperty != objToSerialize.SerializedPropertyProperty, "Shouldn't have deserialized 1");
+
+                var shouldntSerialize2 = JSON.Deserialize<PropertySerializationTester>(serializedWithoutProp, serializeWithTags);
+                Assert(shouldntSerialize2.SerializedPropertyProperty != objToSerialize.SerializedPropertyProperty, $"Shouldn't have deseserialized 2. Res2: {shouldntSerialize.SerializedPropertyProperty}");
+
+                var shouldSerialize = JSON.Deserialize<PropertySerializationTester>(serializedWithProp, serializeWithTags);
+                Assert(shouldSerialize.SerializedPropertyProperty == objToSerialize.SerializedPropertyProperty, $"Failed to deserialize. Res3: {shouldntSerialize.SerializedPropertyProperty}");
+
+                var shouldntSerialize3 = JSON.Deserialize<PropertySerializationTester>(serializedWithProp);
+                Assert(shouldntSerialize3.SerializedPropertyProperty != objToSerialize.SerializedPropertyProperty, "Shouldn't have deserialized 3");
+            }
         }
 
         private static void Assert(bool assertion, string message) {
