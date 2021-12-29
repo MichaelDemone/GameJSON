@@ -1,9 +1,12 @@
-﻿using NUnit.Framework;
+﻿using GameJSON.ManualParsing;
+using GameJSON.ManualParsing.Utils;
+using GameJSON.ReflectionParsing;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FastJSON
+namespace GameJSON
 {
     class Tests
     {
@@ -109,14 +112,38 @@ namespace FastJSON
             }
         }
 
-        public class FastJSONTests
+        public class InPlaceParserTest
+        {
+            [Test]
+            public static void FloatTests()
+            {
+                FloatTest("1234.54321");
+                FloatTest("1234.54321e21");
+                FloatTest("1234.54321e+21");
+                FloatTest("1234.54321e-21");
+
+                FloatTest("-1234.54321");
+                FloatTest("-1234.54321e21");
+                FloatTest("-1234.54321e+21");
+                FloatTest("-1234.54321e-21");
+            }
+
+            private static void FloatTest(string testInput)
+            {
+                double actual = InPlaceParsing.ParseDouble(testInput, 0, testInput.Length);
+                double expected = double.Parse(testInput);
+                Assert(Math.Abs(actual - expected) < 0.01d, $"float test: {actual} does not equal {expected}");
+            }
+        }
+
+        public class ManualJSONTests
         {
             [Test]
             public void ReadTests()
             {
                 TestStruct test = default;
 
-                FastJSONReader json = new FastJSONReader(Test);
+                JSONReader json = new JSONReader(Test);
 
                 json.ExpectObjectStart();
                 while (!json.IsAtObjectEnd())
@@ -183,7 +210,7 @@ namespace FastJSON
                 ts.BoolProperty10 = false;
                 ts.BoolProperty11 = true;
 
-                FastJSONWriter writer = new FastJSONWriter();
+                JSONWriter writer = new JSONWriter();
                 writer.BeginObject();
                 {
                     writer.WriteProperty(nameof(ts.DoubleValueProperty0), ts.DoubleValueProperty0);
@@ -214,33 +241,9 @@ namespace FastJSON
                 writer.EndObject();
                 Print(writer.GetJSON());
             }
-
-            public class InPlaceParserTest
-            {
-                [Test]
-                public static void FloatTests()
-                {
-                    FloatTest("1234.54321");
-                    FloatTest("1234.54321e21");
-                    FloatTest("1234.54321e+21");
-                    FloatTest("1234.54321e-21");
-
-                    FloatTest("-1234.54321");
-                    FloatTest("-1234.54321e21");
-                    FloatTest("-1234.54321e+21");
-                    FloatTest("-1234.54321e-21");
-                }
-
-                private static void FloatTest(string testInput)
-                {
-                    double actual = InPlaceParsing.ParseDouble(testInput, 0, testInput.Length);
-                    double expected = double.Parse(testInput);
-                    Assert(Math.Abs(actual - expected) < 0.01d, $"float test: {actual} does not equal {expected}");
-                }
-            }
         }
 
-        public class EasyJSONTests
+        public class ReflectionJSONTests
         {
             [Test]
             public void DefaultReflectionTest()
@@ -408,7 +411,7 @@ namespace FastJSON
 
             private class Vector3Serializer : IJSONSerialize, IJSONDeserialize
             {
-                public object Deserialize(FastJSONReader reader, IDictionary<Type, IJSONDeserialize> customDeserializers)
+                public object Deserialize(JSONReader reader, IDictionary<Type, IJSONDeserialize> customDeserializers)
                 {
                     Vector3 val = new Vector3();
                     reader.ExpectArrayStart();
@@ -422,7 +425,7 @@ namespace FastJSON
                     return val;
                 }
 
-                public void Serialize(object value, FastJSONWriter writer, IDictionary<Type, IJSONSerialize> customSerializers)
+                public void Serialize(object value, JSONWriter writer, IDictionary<Type, IJSONSerialize> customSerializers)
                 {
                     Vector3 vval = (Vector3)value;
                     writer.BeginArray();

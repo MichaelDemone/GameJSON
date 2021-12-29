@@ -1,9 +1,9 @@
 using System;
 using System.Text;
 
-namespace FastJSON
+namespace GameJSON.ManualParsing
 {
-    public class FastJSONWriter
+    public class JSONWriter
     {
         enum Token
         {

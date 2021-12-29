@@ -1,6 +1,6 @@
 using System;
 
-namespace FastJSON
+namespace GameJSON.ManualParsing.Utils
 {
     public static class InPlaceParsing
     {

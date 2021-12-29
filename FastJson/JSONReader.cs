@@ -1,9 +1,10 @@
+using GameJSON.ManualParsing.Utils;
 using System;
 using System.Text;
 
-namespace FastJSON
+namespace GameJSON.ManualParsing
 {
-    public class FastJSONReader
+    public class JSONReader
     {
         private const int LAST_ASCII_WHITESPACE = 32;
 
@@ -13,7 +14,7 @@ namespace FastJSON
         public char CurrentChar => Json[Position];
         private string RestOfJson => Json.Substring(Position, Json.Length - Position);
 
-        public FastJSONReader(string json)
+        public JSONReader(string json)
         {
             Json = json;
         }

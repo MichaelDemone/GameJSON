@@ -1,29 +1,30 @@
+using GameJSON.ManualParsing;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace FastJSON
+namespace GameJSON.ReflectionParsing
 {
     public interface IJSONSerialize
     {
-        public void Serialize(object value, FastJSONWriter writer, IDictionary<Type, IJSONSerialize> customSerializers);
+        public void Serialize(object value, JSONWriter writer, IDictionary<Type, IJSONSerialize> customSerializers);
     }
 
     public interface IJSONDeserialize
     {
-        public object Deserialize(FastJSONReader reader, IDictionary<Type, IJSONDeserialize> customDeserializers);
+        public object Deserialize(JSONReader reader, IDictionary<Type, IJSONDeserialize> customDeserializers);
     }
 
     public class EasyJSON 
     {
         public static string Serialize(object obj, IDictionary<Type, IJSONSerialize> customSerializers = null)
         {
-            var writer = new FastJSONWriter();
+            var writer = new JSONWriter();
             Serialize(obj, writer, customSerializers);
             return writer.GetJSON();
         }
 
-        public static void Serialize(object objVal, FastJSONWriter writer, IDictionary<Type, IJSONSerialize> customSerializers = null) {
+        public static void Serialize(object objVal, JSONWriter writer, IDictionary<Type, IJSONSerialize> customSerializers = null) {
 
             if(objVal == null) 
             {
@@ -116,14 +117,14 @@ namespace FastJSON
         }
     
         public static T Deserialize<T>(string s, Dictionary<Type, IJSONDeserialize> customDeserializers = null) {
-            FastJSONReader reader = new FastJSONReader(s);
+            JSONReader reader = new JSONReader(s);
             return (T) Deserialize(typeof(T), reader, customDeserializers);
         }
 
         private static readonly Type[] EmptyType = new Type[0];
         private static readonly object[] EmptyParamArray = new object[0];
 
-        public static object Deserialize(Type ttype, FastJSONReader reader, Dictionary<Type, IJSONDeserialize> customDeserializers = null) {
+        public static object Deserialize(Type ttype, JSONReader reader, Dictionary<Type, IJSONDeserialize> customDeserializers = null) {
 
             if (customDeserializers != null && customDeserializers.TryGetValue(ttype, out var customDeserializer))
             {
