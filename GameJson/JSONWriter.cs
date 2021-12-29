@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace GameJSON.ManualParsing
@@ -18,18 +19,17 @@ namespace GameJSON.ManualParsing
             EndArrayValue,
         }
 
-        StringBuilder sb = new StringBuilder();
-        int nesting = 0;
-        private Token lastToken;
-
-        private System.Collections.Generic.Stack<Token> requiredTokens = new System.Collections.Generic.Stack<Token>(50);
+        private readonly Stack<Token> requiredTokens = new Stack<Token>(50);
+        private readonly StringBuilder sb = new StringBuilder();
+        private Token lastToken= Token.Begin;
+        private int tabNesting = 0;
 
         public void BeginObject()
         {
             requiredTokens.Push(Token.EndObject);
 
             Add('{');
-            nesting++;
+            tabNesting++;
             lastToken = Token.BeginObject;
         }
 
@@ -41,7 +41,7 @@ namespace GameJSON.ManualParsing
                 throw new Exception($"Was trying to end an object but needed a {requiredToken}");
             }
 
-            nesting--;
+            tabNesting--;
             Add('\n');
             AddIndents();
             Add('}');
@@ -52,7 +52,7 @@ namespace GameJSON.ManualParsing
         {
             requiredTokens.Push(Token.EndArray);
             Add('[');
-            nesting++;
+            tabNesting++;
             lastToken = Token.BeginArray;
         }
 
@@ -64,7 +64,7 @@ namespace GameJSON.ManualParsing
                 throw new Exception($"Was trying to end an array but needed a {requiredToken}");
             }
 
-            nesting--;
+            tabNesting--;
             Add('\n');
             AddIndents();
             Add(']');
@@ -192,7 +192,7 @@ namespace GameJSON.ManualParsing
 
         private void AddIndents()
         {
-            for (int i = 0; i < nesting; i++)
+            for (int i = 0; i < tabNesting; i++)
             {
                 sb.Append('\t');
             }

@@ -2,6 +2,8 @@ using GameJSON.ManualParsing;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace GameJSON.ReflectionParsing
 {
@@ -117,7 +119,7 @@ namespace GameJSON.ReflectionParsing
         }
     
         public static T Deserialize<T>(string s, Dictionary<Type, IJSONDeserialize> customDeserializers = null) {
-            JSONReader reader = new JSONReader(s);
+            var reader = new JSONReader(s);
             return (T) Deserialize(typeof(T), reader, customDeserializers);
         }
 
@@ -195,10 +197,12 @@ namespace GameJSON.ReflectionParsing
                     return result;
                 }
                 else {
-                    object result = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(ttype);
+                    object result = FormatterServices.GetUninitializedObject(ttype);
                     reader.ExpectObjectStart();
                     {
-                        System.Reflection.FieldInfo[] fields = ttype.GetFields();
+                        PropertyInfo[] properties = ttype.GetProperties();
+                        FieldInfo[] fields = ttype.GetFields();
+
                         while(!reader.IsAtObjectEnd()) {
                             bool consumed = false;
                             foreach(var field in fields) {

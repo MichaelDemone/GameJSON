@@ -1,12 +1,12 @@
 ﻿using GameJSON.ManualParsing;
-using GameJSON.ManualParsing.Utils;
 using GameJSON.ReflectionParsing;
+using GameJSON.ManualParsing.Utils;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GameJSON
+namespace GameJSON.Tests
 {
     class Tests
     {
@@ -143,7 +143,7 @@ namespace GameJSON
             {
                 TestStruct test = default;
 
-                JSONReader json = new JSONReader(Test);
+                var json = new JSONReader(Test);
 
                 json.ExpectObjectStart();
                 while (!json.IsAtObjectEnd())
@@ -202,15 +202,17 @@ namespace GameJSON
             [Test]
             public void WriteTests()
             {
-                TestStruct ts = new TestStruct();
-                ts.DoubleValueProperty0 = 142.010;
-                ts.ValueProperty1 = "142.010";
+                var ts = new TestStruct
+                {
+                    DoubleValueProperty0 = 142.010,
+                    ValueProperty1 = "142.010",
+                    IntArray = new int[] { 1, 2, 3, 4, 5, 78, 9 },
+                    BoolProperty10 = false,
+                    BoolProperty11 = true
+                };
                 ts.ObjectProperty1.InNestedObject = true;
-                ts.IntArray = new int[] { 1, 2, 3, 4, 5, 78, 9 };
-                ts.BoolProperty10 = false;
-                ts.BoolProperty11 = true;
 
-                JSONWriter writer = new JSONWriter();
+                var writer = new JSONWriter();
                 writer.BeginObject();
                 {
                     writer.WriteProperty(nameof(ts.DoubleValueProperty0), ts.DoubleValueProperty0);
@@ -307,8 +309,10 @@ namespace GameJSON
             {
                 TestStruct ts = TestStruct.MakeDefault();
                 ts.ListOfStructs = new List<TestStruct.NestedStruct>(10);
-                TestStruct.NestedStruct ns = new TestStruct.NestedStruct();
-                ns.RandomValue = 1;
+                var ns = new TestStruct.NestedStruct
+                {
+                    RandomValue = 1
+                };
                 ts.ListOfStructs.Add(ns);
                 string s = JSON.Serialize(ts);
                 Print(s);
@@ -325,8 +329,10 @@ namespace GameJSON
             {
                 TestStruct ts = TestStruct.MakeDefault();
                 ts.NestedConcreteClassArray = new TestStruct.NestedClass[10];
-                TestStruct.NestedClass nc = new TestStruct.NestedClass();
-                nc.MyString = "TESTSSSSS";
+                var nc = new TestStruct.NestedClass
+                {
+                    MyString = "TESTSSSSS"
+                };
                 ts.NestedConcreteClassArray[0] = nc;
                 string s = JSON.Serialize(ts);
                 Print(s);
@@ -343,8 +349,10 @@ namespace GameJSON
             {
                 TestStruct ts = TestStruct.MakeDefault();
                 ts.ListOfNestedConcreteClass = new List<TestStruct.NestedClass>(10);
-                var ns = new TestStruct.NestedClass();
-                ns.MyString = "TEST2";
+                var ns = new TestStruct.NestedClass
+                {
+                    MyString = "TEST2"
+                };
                 ts.ListOfNestedConcreteClass.Add(ns);
                 string s = JSON.Serialize(ts);
                 Print(s);
@@ -359,8 +367,10 @@ namespace GameJSON
             [Test]
             public void GenericReflectionTest()
             {
-                var ds = new GenericAsHeck<TestStruct>();
-                ds.InstanceOfThing = TestStruct.MakeDefault();
+                var ds = new GenericAsHeck<TestStruct>
+                {
+                    InstanceOfThing = TestStruct.MakeDefault()
+                };
                 ds.InstanceOfThing.BoolProperty11 = true;
                 string s = JSON.Serialize(ds);
                 Print(s);
@@ -376,10 +386,12 @@ namespace GameJSON
             [Test]
             public void CustomSerializer()
             {
-                Vector3 v3 = new Vector3();
-                v3.x = 1;
-                v3.y = 2;
-                v3.z = 3;
+                var v3 = new Vector3
+                {
+                    x = 1,
+                    y = 2,
+                    z = 3
+                };
                 string s = JSON.Serialize(v3);
                 Print($"Pre converter {s}");
                 string s2 = JSON.Serialize(v3, new Dictionary<Type, IJSONSerialize>()
@@ -393,16 +405,18 @@ namespace GameJSON
             [Test]
             public void CustomDeserializer()
             {
-                Vector3 v3 = new Vector3();
-                v3.x = 1;
-                v3.y = 2;
-                v3.z = 3;
+                var v3 = new Vector3
+                {
+                    x = 1,
+                    y = 2,
+                    z = 3
+                };
                 string s2 = JSON.Serialize(v3, new Dictionary<Type, IJSONSerialize>()
                 {
                     {typeof(Vector3), new Vector3Serializer() }
                 });
 
-                Vector3 v3_deserialize = JSON.Deserialize<Vector3>(s2, new Dictionary<Type, IJSONDeserialize>()
+                var v3_deserialize = JSON.Deserialize<Vector3>(s2, new Dictionary<Type, IJSONDeserialize>()
                 {
                     {typeof(Vector3), new Vector3Serializer() }
                 });
@@ -413,7 +427,7 @@ namespace GameJSON
             {
                 public object Deserialize(JSONReader reader, IDictionary<Type, IJSONDeserialize> customDeserializers)
                 {
-                    Vector3 val = new Vector3();
+                    var val = new Vector3();
                     reader.ExpectArrayStart();
                     {
                         val.x = (float) reader.ConsumeDoubleValue();
@@ -427,7 +441,7 @@ namespace GameJSON
 
                 public void Serialize(object value, JSONWriter writer, IDictionary<Type, IJSONSerialize> customSerializers)
                 {
-                    Vector3 vval = (Vector3)value;
+                    var vval = (Vector3)value;
                     writer.BeginArray();
                     {
                         writer.WriteArrayValue(vval.x);
