@@ -3,8 +3,8 @@ A fast lower-level JSON library for C#, particularly aimed at games. This was bu
 
 # Structure
 Comes in 2 parts
-* GameJSON.ReflectionParsing - Reflection Library for serializing/deserializing objects to/from JSON
-* GameJSON.ManualParsing - A manual parsing library that ReflectionParsing is built on top of. If ReflectionParsing doesn't (de)serialize your JSON fast enough, using ManualParsing to manually (de)serialize will give you a massive performance boost
+* GameJSON.ReflectionParsing - Reflection Library for serializing/deserializing objects to/from JSON. Contains JSON class.
+* GameJSON.ManualParsing - A manual parsing library that ReflectionParsing is built on top of. If ReflectionParsing doesn't (de)serialize your JSON fast enough, using ManualParsing to manually (de)serialize will give you a massive performance boost. Contains JSONReader and JSONWriter class.
 
 # Reflection Parsing Goals
 * All fields on an object will be serialized and deserialized 
