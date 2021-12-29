@@ -2,28 +2,28 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace FastJson
+namespace FastJSON
 {
     public interface IJSONSerialize
     {
-        public void Serialize(object value, FastJSONWriter writer, Dictionary<Type, IJSONSerialize> customSerializers);
+        public void Serialize(object value, FastJSONWriter writer, IDictionary<Type, IJSONSerialize> customSerializers);
     }
 
     public interface IJSONDeserialize
     {
-        public object Deserialize(FastJSONReader reader, Dictionary<Type, IJSONDeserialize> customDeserializers);
+        public object Deserialize(FastJSONReader reader, IDictionary<Type, IJSONDeserialize> customDeserializers);
     }
 
     public class EasyJSON 
     {
-        public static string Serialize(object obj, Dictionary<Type, IJSONSerialize> customSerializers = null)
+        public static string Serialize(object obj, IDictionary<Type, IJSONSerialize> customSerializers = null)
         {
-            FastJson.FastJSONWriter writer = new FastJson.FastJSONWriter();
+            var writer = new FastJSONWriter();
             Serialize(obj, writer, customSerializers);
             return writer.GetJSON();
         }
 
-        public static void Serialize(object objVal, FastJSONWriter writer, Dictionary<Type, IJSONSerialize> customSerializers = null) {
+        public static void Serialize(object objVal, FastJSONWriter writer, IDictionary<Type, IJSONSerialize> customSerializers = null) {
 
             if(objVal == null) 
             {
@@ -201,8 +201,7 @@ namespace FastJson
                         while(!reader.IsAtObjectEnd()) {
                             bool consumed = false;
                             foreach(var field in fields) {
-                                if(reader.ConsumeIfProperyNameEquals(field.Name)) {
-                                    UnityEngine.Debug.Log($"Consuming: {field.Name}");
+                                if(reader.TryConsumeProperty(field.Name)) {
                                     var fieldValue = Deserialize(field.FieldType, reader);
                                     field.SetValue(result, fieldValue);
                                     consumed = true;

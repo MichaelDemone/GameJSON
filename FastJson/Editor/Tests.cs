@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FastJson
+namespace FastJSON
 {
     class Tests
     {
@@ -121,37 +121,37 @@ namespace FastJson
                 json.ExpectObjectStart();
                 while (!json.IsAtObjectEnd())
                 {
-                    if (json.ConsumeIfProperyNameEquals(nameof(test.DoubleValueProperty0)))
+                    if (json.TryConsumeProperty(nameof(test.DoubleValueProperty0)))
                     {
                         test.DoubleValueProperty0 = json.ConsumeDoubleValue();
                     }
-                    else if (json.ConsumeIfProperyNameEquals(nameof(test.ValueProperty1)))
+                    else if (json.TryConsumeProperty(nameof(test.ValueProperty1)))
                     {
                         test.ValueProperty1 = json.ConsumeStringValue();
                     }
-                    else if (json.ConsumeIfProperyNameEquals(nameof(test.BoolProperty10)))
+                    else if (json.TryConsumeProperty(nameof(test.BoolProperty10)))
                     {
                         test.BoolProperty10 = json.ConsumeBoolValue();
                     }
-                    else if (json.ConsumeIfProperyNameEquals(nameof(test.BoolProperty11)))
+                    else if (json.TryConsumeProperty(nameof(test.BoolProperty11)))
                     {
                         test.BoolProperty11 = json.ConsumeBoolValue();
                     }
-                    else if (json.ConsumeIfProperyNameEquals(nameof(test.ObjectProperty1)))
+                    else if (json.TryConsumeProperty(nameof(test.ObjectProperty1)))
                     {
                         json.ExpectObjectStart();
                         {
-                            json.ConsumeIfProperyNameEquals("MyNestedObject");
+                            json.TryConsumeProperty("MyNestedObject");
                             json.ExpectObjectStart();
                             {
-                                json.ConsumeIfProperyNameEquals("InNestedObject");
+                                json.TryConsumeProperty("InNestedObject");
                                 test.ObjectProperty1.InNestedObject = json.ConsumeBoolValue();
                             }
                             json.ExpectObjectEnd();
                         }
                         json.ExpectObjectEnd();
                     }
-                    else if (json.ConsumeIfProperyNameEquals(nameof(test.IntArray)))
+                    else if (json.TryConsumeProperty(nameof(test.IntArray)))
                     {
                         json.ConsumeUnknownValue();
                     }
@@ -170,8 +170,6 @@ namespace FastJson
                 Assert(test.BoolProperty10 == true, $"{nameof(test.BoolProperty10)}: {test.BoolProperty10} does not equal true");
                 Assert(test.BoolProperty11 == false, $"{nameof(test.BoolProperty11)}: {test.BoolProperty11} does not equal true");
                 Assert(test.ObjectProperty1.InNestedObject == true, $"{nameof(test.ObjectProperty1.InNestedObject)}: {test.ObjectProperty1.InNestedObject} does not equal true");
-
-                Print("Done!");
             }
 
             [Test]
@@ -410,21 +408,21 @@ namespace FastJson
 
             private class Vector3Serializer : IJSONSerialize, IJSONDeserialize
             {
-                public object Deserialize(FastJSONReader reader, Dictionary<Type, IJSONDeserialize> customDeserializers)
+                public object Deserialize(FastJSONReader reader, IDictionary<Type, IJSONDeserialize> customDeserializers)
                 {
                     Vector3 val = new Vector3();
                     reader.ExpectArrayStart();
                     {
                         val.x = (float) reader.ConsumeDoubleValue();
                         val.y = (float) reader.ConsumeDoubleValue();
-                        val.z = (float)reader.ConsumeDoubleValue();
+                        val.z = (float) reader.ConsumeDoubleValue();
                     }
                     reader.ExpectArrayEnd();
 
                     return val;
                 }
 
-                public void Serialize(object value, FastJSONWriter writer, Dictionary<Type, IJSONSerialize> customSerializers)
+                public void Serialize(object value, FastJSONWriter writer, IDictionary<Type, IJSONSerialize> customSerializers)
                 {
                     Vector3 vval = (Vector3)value;
                     writer.BeginArray();
