@@ -71,7 +71,7 @@ namespace GameJSON.ManualParsing
             lastToken = Token.EndArray;
         }
 
-        public void StartArrayValue()
+        public void BeginArrayValue()
         {
             if (lastToken == Token.EndArrayValue)
             {
@@ -86,7 +86,7 @@ namespace GameJSON.ManualParsing
 
         public void WriteArrayValue(string value)
         {
-            StartArrayValue();
+            BeginArrayValue();
             Add('"');
             AddEscaped(value);
             Add('"');
@@ -99,7 +99,7 @@ namespace GameJSON.ManualParsing
 
         public void WriteArrayRawString(string value)
         {
-            StartArrayValue();
+            BeginArrayValue();
             Add(value);
             EndArrayValue();
         }

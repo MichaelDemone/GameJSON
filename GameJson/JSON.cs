@@ -122,7 +122,7 @@ namespace GameJSON.ReflectionParsing
                 writer.BeginArray();
                 {
                     foreach(var val in enumer) {
-                        writer.StartArrayValue();
+                        writer.BeginArrayValue();
                         Serialize(val, writer, settings);
                         writer.EndArrayValue();
                     }
