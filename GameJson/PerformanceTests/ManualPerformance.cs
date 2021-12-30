@@ -54,7 +54,6 @@ public class ManualPerformance : MonoBehaviour
 
             sw.Stop();
             print($"Manual parsing took {sw.ElapsedMilliseconds}ms");
-            //print(gameJsonSerializeString);
 
             sw.Reset();
             GC.Collect();
@@ -84,7 +83,6 @@ public class ManualPerformance : MonoBehaviour
 
             sw.Stop();
             print($"Manual Newtonsoft took {sw.ElapsedMilliseconds}ms");
-            //print(newtonsoftSerializeResult);
         }
 
         List<TestPosition> newtonsoftDeserializationResult;

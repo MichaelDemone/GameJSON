@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using UnityEditor;
 using UnityEngine;
 
 public struct MyVector3
@@ -67,7 +68,6 @@ public class ReflectionPerformance : MonoBehaviour
 
             sw.Stop();
             print($"Reflection parsing took {sw.ElapsedMilliseconds}ms");
-            //print(gameJsonSerializeString);
 
             sw.Reset();
             GC.Collect();
@@ -94,7 +94,6 @@ public class ReflectionPerformance : MonoBehaviour
 
             sw.Stop();
             print($"Newtonsoft took {sw.ElapsedMilliseconds}ms");
-            //print(newtonsoftSerializeResult);
         }
 
         List<TestPosition> newtonsoftDeserializationResult;
