@@ -1,5 +1,5 @@
 # Game JSON
-A fast lower-level JSON library for C#, particularly aimed at games. This was built to satisfy the need that most JSON libraries cannot be sped up enough to (de)serialize files in a sufficient amount of time without incurring a framerate drop. Currently only deserializes strings and serializes to strings.
+A fast no dependency JSON library for C#, particularly aimed at games. This was built to satisfy the need that most JSON libraries cannot be sped up enough to (de)serialize files in a sufficient amount of time without incurring a framerate drop. Currently only deserializes strings and serializes to strings.
 
 # Structure
 Comes in 2 parts
