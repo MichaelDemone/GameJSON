@@ -236,7 +236,7 @@ namespace GameJSON.ManualParsing
             while (Json[Position] != '"')
             {
                 Position++;
-                if (Json[Position] == '\\') Position++; // Skip escaped character in case it's "
+                if (Json[Position] == '\\') Position += 2; // Skip escaped character in case it's "
             }
             Expect('"');
             Accept(',');

@@ -45,7 +45,8 @@ namespace GameJSON.Tests
     ""TotalUnknown"": [],
     ""TotalUnknown"": [],
     ""IntArray""  :  [1,2,3,4 , 5 ,78, 9],
-    ""BoolArray""  :  [true, True, TRUE, false, False, FALSE]
+    ""BoolArray""  :  [true, True, TRUE, false, False, FALSE],
+    ""UnknownString"" : ""lmao get ready for escaped characters \""""
 }
 ";
 
@@ -258,16 +259,29 @@ namespace GameJSON.Tests
                 Assert(deserializeRes.BoolProperty10, "Did not properly deserialize");
             }
 
-            [Test]
-            public void StringReflectionTest()
+            private void TestString(string testString)
             {
                 TestStruct ts = TestStruct.MakeDefault();
-                string escapeString = "Escape characters lets gooo. NewLine: \n. Quote: \". Slash \\. Backward slash /. Backspace \b. Formfeed \f. carridge return \r. Tab \t.";
-                ts.ValueProperty1 = escapeString;
+                ts.ValueProperty1 = testString;
                 string s = JSON.Serialize(ts);
                 Print(s);
                 var deserializeRes = JSON.Deserialize<TestStruct>(s);
-                Assert(deserializeRes.ValueProperty1 == ts.ValueProperty1, "Did not properly deserialize");
+                Print(testString);
+                Print(deserializeRes.ValueProperty1);
+
+                Assert(testString == deserializeRes.ValueProperty1 && deserializeRes.ValueProperty1 == ts.ValueProperty1, "Did not properly deserialize");
+            }
+
+            [Test]
+            public void StringEscapedTest()
+            {
+                TestString("Escape characters lets gooo. NewLine: \n. Quote: \". Slash \\. Backward slash /. Backspace \b. Formfeed \f. carridge return \r. Tab \t.");
+            }
+
+            [Test]
+            public void StringDoubleEscapedTest()
+            {
+                TestString("Deserializing something that escapes characters already \\\"");
             }
 
             [Test]
