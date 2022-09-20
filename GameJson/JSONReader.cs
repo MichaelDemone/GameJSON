@@ -22,7 +22,10 @@ namespace GameJSON.ManualParsing
         public bool TryConsumeProperty(string propertyName)
         {
             int position = Position;
-            ExpectAt('"', position++);
+            if (!TryExpectAt('"', position++))
+            {
+                return false;
+            }
 
             int propIndex = 0;
             while (propIndex < propertyName.Length && position < Json.Length - 1)
@@ -333,6 +336,12 @@ namespace GameJSON.ManualParsing
             {
                 throw new Exception($"Expected {c} and got {actual}");
             }
+        }
+
+        private bool TryExpectAt(char c, int position)
+        {
+            char actual = Json[position];
+            return actual == c;
         }
 
         private void Accept(char c)
