@@ -1,12 +1,9 @@
 ﻿using GameJSON.ManualParsing;
 using GameJSON.ReflectionParsing;
 using GameJSON.ManualParsing.Utils;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
+using SimpleTester.TestAttributes;
 
-namespace GameJSON.Tests
+namespace GameJSON.Testing.Functionality
 {
     class Tests
     {
@@ -65,8 +62,8 @@ namespace GameJSON.Tests
             public ulong ULongVal;
             public short ShortVal;
             public ushort UShortVal;
-            
-            
+
+
             public double DoubleValueProperty0;
             public int IntValueProperty0;
             public short ShortValueProperty0;
@@ -79,7 +76,7 @@ namespace GameJSON.Tests
             public bool[] BoolArray;
             public List<int> ListOfInts;
             public NestedStruct ObjectProperty1;
-            
+
             public NestedStruct[] Structs;
             public List<NestedStruct> ListOfStructs;
 
@@ -94,19 +91,20 @@ namespace GameJSON.Tests
                 public int RandomValue;
             }
 
-            public class NestedClass 
+            public class NestedClass
             {
                 public bool InNestedClass;
                 public string MyString;
             }
 
-            public class NestedGenericClass<T> 
+            public class NestedGenericClass<T>
             {
                 public T OnlyObject;
                 public bool InGenericClass;
             }
 
-            public static TestStruct MakeDefault() {
+            public static TestStruct MakeDefault()
+            {
                 TestStruct ts = default;
                 ts.CharVal = 'a';
                 return ts;
@@ -397,6 +395,35 @@ namespace GameJSON.Tests
                 public T InstanceOfThing;
             }
 
+            public struct Vector3
+            {
+                public float x, y, z;
+
+                public static bool operator ==(Vector3 rhs, Vector3 lhs)
+                {
+                    return rhs.x == lhs.x && rhs.y == lhs.y && rhs.z == lhs.z;
+                }
+
+                public static bool operator !=(Vector3 rhs, Vector3 lhs)
+                {
+                    return rhs.x != lhs.x || rhs.y != lhs.y || rhs.z != lhs.z;
+                }
+
+                public override bool Equals(object? obj)
+                {
+                    if (obj is Vector3 v)
+                    {
+                        return v == this;
+                    }
+                    return false;
+                }
+
+                public override int GetHashCode()
+                {
+                    return (x, y, z).GetHashCode();
+                }
+            }
+
             JSONSettings customSettings = new JSONSettings()
             {
                 CustomSerializers = new Dictionary<Type, IJSONSerialize>()
@@ -448,9 +475,9 @@ namespace GameJSON.Tests
                     var val = new Vector3();
                     reader.ExpectArrayStart();
                     {
-                        val.x = (float) reader.ConsumeDoubleValue();
-                        val.y = (float) reader.ConsumeDoubleValue();
-                        val.z = (float) reader.ConsumeDoubleValue();
+                        val.x = (float)reader.ConsumeDoubleValue();
+                        val.y = (float)reader.ConsumeDoubleValue();
+                        val.z = (float)reader.ConsumeDoubleValue();
                     }
                     reader.ExpectArrayEnd();
 
@@ -554,12 +581,14 @@ namespace GameJSON.Tests
             }
         }
 
-        private static void Assert(bool assertion, string message) {
-            UnityEngine.Debug.Assert(assertion, message);
+        private static void Assert(bool assertion, string message)
+        {
+            System.Diagnostics.Debug.Assert(assertion, message);
         }
 
-        private static void Print(string message) {
-            UnityEngine.Debug.Log(message);
+        private static void Print(string message)
+        {
+            System.Diagnostics.Debug.WriteLine(message);
         }
     }
 }

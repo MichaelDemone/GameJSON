@@ -1,32 +1,28 @@
 using GameJSON.ManualParsing;
 using GameJSON.ReflectionParsing;
 using Newtonsoft.Json;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
-using UnityEngine;
 
-public class ManualPerformance : MonoBehaviour
+public class ManualPerformance
 {
-    public void Start()
+    public static void Start()
     {
-        print("Starting manual cold test");
+        Console.WriteLine("Starting manual cold test");
         RunSerializationTest();
-        print("Starting manual hot test");
+        Console.WriteLine("Starting manual hot test");
         RunSerializationTest();
     }
 
-    [ContextMenu("RunTest")]
-    public void RunSerializationTest()
+    public static void RunSerializationTest()
     {
         List<TestPosition> testPositions = new List<TestPosition>();
+        Random r = new Random(1);
         for (int i = 0; i < 1000; i++)
         {
             testPositions.Add(new TestPosition()
             {
                 EntityName = $"Entity{i}",
-                Position = new MyVector3(UnityEngine.Random.value * 100, UnityEngine.Random.value * 100, UnityEngine.Random.value * 100)
+                Position = new MyVector3(r.NextSingle() * 100, r.NextSingle() * 100, r.NextSingle() * 100)
             });
         }
         GC.Collect();
@@ -53,7 +49,7 @@ public class ManualPerformance : MonoBehaviour
             gameJsonSerializeString = JSON.Serialize(testPositions, settings);
 
             sw.Stop();
-            print($"Manual parsing took {sw.ElapsedMilliseconds}ms");
+            Console.WriteLine($"Manual parsing took {sw.ElapsedMilliseconds}ms");
 
             sw.Reset();
             GC.Collect();
@@ -66,7 +62,7 @@ public class ManualPerformance : MonoBehaviour
             gameJsonDeserializationResult = JSON.Deserialize<List<TestPosition>>(gameJsonSerializeString, settings);
 
             sw.Stop();
-            print($"Manual deserialization took {sw.ElapsedMilliseconds}ms");
+            Console.WriteLine($"Manual deserialization took {sw.ElapsedMilliseconds}ms");
 
             sw.Reset();
             GC.Collect();
@@ -82,7 +78,7 @@ public class ManualPerformance : MonoBehaviour
             newtonsoftSerializeResult = JsonConvert.SerializeObject(testPositions, newtonsoftSettings);
 
             sw.Stop();
-            print($"Manual Newtonsoft took {sw.ElapsedMilliseconds}ms");
+            Console.WriteLine($"Manual Newtonsoft took {sw.ElapsedMilliseconds}ms");
         }
 
         List<TestPosition> newtonsoftDeserializationResult;
@@ -92,7 +88,7 @@ public class ManualPerformance : MonoBehaviour
             newtonsoftDeserializationResult = JsonConvert.DeserializeObject<List<TestPosition>>(newtonsoftSerializeResult, newtonsoftSettings);
 
             sw.Stop();
-            print($"Manual Newtonsoft deserialization took {sw.ElapsedMilliseconds}ms");
+            Console.WriteLine($"Manual Newtonsoft deserialization took {sw.ElapsedMilliseconds}ms");
 
             sw.Reset();
             GC.Collect();
