@@ -13,12 +13,12 @@ namespace GameJSON.ReflectionParsing
 
     public interface IJSONSerialize
     {
-        public void Serialize(object value, JSONWriter writer, JSONSettings settings);
+        void Serialize(object value, JSONWriter writer, JSONSettings settings);
     }
 
     public interface IJSONDeserialize
     {
-        public object Deserialize(JSONReader reader, JSONSettings settings);
+        object Deserialize(JSONReader reader, JSONSettings settings);
     }
 
     public class JSONSettings

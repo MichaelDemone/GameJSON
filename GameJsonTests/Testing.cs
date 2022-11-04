@@ -1,11 +1,11 @@
-﻿using GameJSON.ManualParsing;
+using GameJSON.ManualParsing;
 using GameJSON.ReflectionParsing;
 using GameJSON.ManualParsing.Utils;
-using SimpleTester.TestAttributes;
 
-namespace GameJSON.Testing.Functionality
+namespace GameJSONTests
 {
-    class Tests
+    [TestClass]
+    public class Tests
     {
         private const string Test = @"
 {
@@ -111,9 +111,10 @@ namespace GameJSON.Testing.Functionality
             }
         }
 
+        [TestClass]
         public class InPlaceParserTest
         {
-            [Test]
+            [TestMethod]
             public static void FloatTests()
             {
                 FloatTest("1234.54321");
@@ -135,9 +136,10 @@ namespace GameJSON.Testing.Functionality
             }
         }
 
+        [TestClass]
         public class ManualJSONTests
         {
-            [Test]
+            [TestMethod]
             public void ReadTests()
             {
                 TestStruct test = default;
@@ -198,7 +200,7 @@ namespace GameJSON.Testing.Functionality
                 Assert(test.ObjectProperty1.InNestedObject == true, $"{nameof(test.ObjectProperty1.InNestedObject)}: {test.ObjectProperty1.InNestedObject} does not equal true");
             }
 
-            [Test]
+            [TestMethod]
             public void WriteTests()
             {
                 var ts = new TestStruct
@@ -244,9 +246,10 @@ namespace GameJSON.Testing.Functionality
             }
         }
 
+        [TestClass]
         public class ReflectionJSONTests
         {
-            [Test]
+            [TestMethod]
             public void DefaultReflectionTest()
             {
                 TestStruct ts = TestStruct.MakeDefault();
@@ -270,19 +273,19 @@ namespace GameJSON.Testing.Functionality
                 Assert(testString == deserializeRes.ValueProperty1 && deserializeRes.ValueProperty1 == ts.ValueProperty1, "Did not properly deserialize");
             }
 
-            [Test]
+            [TestMethod]
             public void StringEscapedTest()
             {
                 TestString("Escape characters lets gooo. NewLine: \n. Quote: \". Slash \\. Backward slash /. Backspace \b. Formfeed \f. carridge return \r. Tab \t.");
             }
 
-            [Test]
+            [TestMethod]
             public void StringDoubleEscapedTest()
             {
                 TestString("Deserializing something that escapes characters already \\\"");
             }
 
-            [Test]
+            [TestMethod]
             public void IntArrayReflectionTest()
             {
                 TestStruct ts = TestStruct.MakeDefault();
@@ -298,7 +301,7 @@ namespace GameJSON.Testing.Functionality
                 }
             }
 
-            [Test]
+            [TestMethod]
             public void StructArrays()
             {
                 TestStruct ts = TestStruct.MakeDefault();
@@ -316,7 +319,7 @@ namespace GameJSON.Testing.Functionality
                 }
             }
 
-            [Test]
+            [TestMethod]
             public void StructList()
             {
                 TestStruct ts = TestStruct.MakeDefault();
@@ -336,7 +339,7 @@ namespace GameJSON.Testing.Functionality
                 }
             }
 
-            [Test]
+            [TestMethod]
             public void ClassArrays()
             {
                 TestStruct ts = TestStruct.MakeDefault();
@@ -356,7 +359,7 @@ namespace GameJSON.Testing.Functionality
                 }
             }
 
-            [Test]
+            [TestMethod]
             public void ClassList()
             {
                 TestStruct ts = TestStruct.MakeDefault();
@@ -376,7 +379,7 @@ namespace GameJSON.Testing.Functionality
                 }
             }
 
-            [Test]
+            [TestMethod]
             public void GenericReflectionTest()
             {
                 var ds = new GenericAsHeck<TestStruct>
@@ -436,7 +439,7 @@ namespace GameJSON.Testing.Functionality
                     }
             };
 
-            [Test]
+            [TestMethod]
             public void CustomSerializer()
             {
                 var v3 = new Vector3
@@ -452,7 +455,7 @@ namespace GameJSON.Testing.Functionality
                 Assert(s != s2, "Custom serializer did not change output");
             }
 
-            [Test]
+            [TestMethod]
             public void CustomDeserializer()
             {
                 var v3 = new Vector3
@@ -513,7 +516,7 @@ namespace GameJSON.Testing.Functionality
                 private int privateProperty { get; set; }
             }
 
-            [Test]
+            [TestMethod]
             public void AutoPropertySerializationTest()
             {
                 var objToSerialize = new PropertySerializationTester()
@@ -542,7 +545,7 @@ namespace GameJSON.Testing.Functionality
                 Assert(res3.PublicAutoProperty != objToSerialize.PublicAutoProperty, $"Auto properties set when it shouldn't have been. Res3: {res.PublicAutoProperty}");
             }
 
-            [Test]
+            [TestMethod]
             public void PropertyTagSerializationTest()
             {
                 var objToSerialize = new PropertySerializationTester()
@@ -583,7 +586,7 @@ namespace GameJSON.Testing.Functionality
 
         private static void Assert(bool assertion, string message)
         {
-            System.Diagnostics.Debug.Assert(assertion, message);
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(assertion, message);
         }
 
         private static void Print(string message)

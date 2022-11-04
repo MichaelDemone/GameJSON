@@ -1,9 +1,35 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+	<TargetFramework>netstandard2.1</TargetFramework>
+    <Title>Game JSON</Title>
+    <Authors>Michael Demone</Authors>
+    <Description>A fast no dependency JSON library for C#, particularly aimed at games. This was built to satisfy the need that most JSON libraries cannot be sped up enough to (de)serialize files in a sufficient amount of time without incurring a framerate drop. </Description>
+    <PackageProjectUrl>https://github.com/MichaelDemone/GameJSON</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <AssemblyVersion>0.0.1</AssemblyVersion>
+    <NeutralLanguage>en</NeutralLanguage>
+    <PackageTags>JSON</PackageTags>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/MichaelDemone/GameJSON</RepositoryUrl>
+    <Copyright>Copyright (c) 2021 Michael Demone</Copyright>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Version>0.0.2</Version>
+    <PackageReleaseNotes>Extremely alpha release</PackageReleaseNotes>
+    <FileVersion>0.0.0.1</FileVersion>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\ProceduralMonoGame\GameJSON\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\ProceduralMonoGame\GameJSON\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

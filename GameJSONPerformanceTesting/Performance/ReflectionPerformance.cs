@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Newtonsoft.Json;
-using SimpleTester.Assertions;
+using System.Diagnostics;
 
 public struct MyVector3
 {
@@ -64,7 +64,7 @@ public class ReflectionPerformance
             gameJsonSerializeString = GameJSON.ReflectionParsing.JSON.Serialize(testPositions);
 
             sw.Stop();
-            Console.WriteLine($"Reflection parsing took {sw.ElapsedMilliseconds}ms");
+            Console.WriteLine($"Reflection parsing took {sw.ElapsedTicks} ticks");
 
             sw.Reset();
             GC.Collect();
@@ -77,7 +77,7 @@ public class ReflectionPerformance
             gameJsonDeserializationResult = GameJSON.ReflectionParsing.JSON.Deserialize<List<TestPosition>>(gameJsonSerializeString);
 
             sw.Stop();
-            Console.WriteLine($"Reflection deserialization took {sw.ElapsedMilliseconds}ms");
+            Console.WriteLine($"Reflection deserialization took {sw.ElapsedTicks} ticks");
 
             sw.Reset();
             GC.Collect();
@@ -90,7 +90,7 @@ public class ReflectionPerformance
             newtonsoftSerializeResult = JsonConvert.SerializeObject(testPositions);
 
             sw.Stop();
-            Console.WriteLine($"Newtonsoft took {sw.ElapsedMilliseconds}ms");
+            Console.WriteLine($"Newtonsoft took {sw.ElapsedTicks} ticks");
         }
 
         List<TestPosition> newtonsoftDeserializationResult;
@@ -100,7 +100,7 @@ public class ReflectionPerformance
             newtonsoftDeserializationResult = JsonConvert.DeserializeObject<List<TestPosition>>(newtonsoftSerializeResult);
 
             sw.Stop();
-            Console.WriteLine($"Newtonsoft deserialization took {sw.ElapsedMilliseconds}ms");
+            Console.WriteLine($"Newtonsoft deserialization took {sw.ElapsedTicks} ticks");
 
             sw.Reset();
             GC.Collect();
@@ -108,11 +108,11 @@ public class ReflectionPerformance
 
         for(int i = 0; i < 1000; i++)
         {
-            Asserts.Assert(testPositions[i].EntityName == gameJsonDeserializationResult[i].EntityName);
-            Asserts.Assert(testPositions[i].Position == gameJsonDeserializationResult[i].Position);
+            Debug.Assert(testPositions[i].EntityName == gameJsonDeserializationResult[i].EntityName);
+            Debug.Assert(testPositions[i].Position == gameJsonDeserializationResult[i].Position);
 
-            Asserts.Assert(testPositions[i].EntityName == newtonsoftDeserializationResult[i].EntityName);
-            Asserts.Assert(testPositions[i].Position == newtonsoftDeserializationResult[i].Position);
+            Debug.Assert(testPositions[i].EntityName == newtonsoftDeserializationResult[i].EntityName);
+            Debug.Assert(testPositions[i].Position == newtonsoftDeserializationResult[i].Position);
         }
     }
 }

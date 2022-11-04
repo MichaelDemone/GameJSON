@@ -49,7 +49,7 @@ public class ManualPerformance
             gameJsonSerializeString = JSON.Serialize(testPositions, settings);
 
             sw.Stop();
-            Console.WriteLine($"Manual parsing took {sw.ElapsedMilliseconds}ms");
+            Console.WriteLine($"Manual parsing took {sw.ElapsedTicks} ticks");
 
             sw.Reset();
             GC.Collect();
@@ -62,7 +62,7 @@ public class ManualPerformance
             gameJsonDeserializationResult = JSON.Deserialize<List<TestPosition>>(gameJsonSerializeString, settings);
 
             sw.Stop();
-            Console.WriteLine($"Manual deserialization took {sw.ElapsedMilliseconds}ms");
+            Console.WriteLine($"Manual deserialization took {sw.ElapsedTicks} ticks");
 
             sw.Reset();
             GC.Collect();
@@ -78,7 +78,7 @@ public class ManualPerformance
             newtonsoftSerializeResult = JsonConvert.SerializeObject(testPositions, newtonsoftSettings);
 
             sw.Stop();
-            Console.WriteLine($"Manual Newtonsoft took {sw.ElapsedMilliseconds}ms");
+            Console.WriteLine($"Manual Newtonsoft took {sw.ElapsedTicks} ticks");
         }
 
         List<TestPosition> newtonsoftDeserializationResult;
@@ -88,7 +88,7 @@ public class ManualPerformance
             newtonsoftDeserializationResult = JsonConvert.DeserializeObject<List<TestPosition>>(newtonsoftSerializeResult, newtonsoftSettings);
 
             sw.Stop();
-            Console.WriteLine($"Manual Newtonsoft deserialization took {sw.ElapsedMilliseconds}ms");
+            Console.WriteLine($"Manual Newtonsoft deserialization took {sw.ElapsedTicks} ticks");
 
             sw.Reset();
             GC.Collect();
