@@ -17,14 +17,11 @@ Comes in 2 parts
 
 # Performance
 
-These are the performance test results. As a summary, this behaves significantly faster than Newtonsoft in most cases except when loading using reflection with a hot cache. This is most likely because GameJSON does absolutely no caching. Most importantly though, GameJSON manually deserializes JSON at 5ms cold (i.e. first run with data type) and 2ms hot (i.e. second run with data type), whereas Newtonsoft manually deserializes in 95ms cold and 11ms hot. This means that files can be loaded with GameJSON in games without incurring a huge frame spike. 
-
-On Android, the differences between GameJSON and Newtonsoft/JSON.Net are vast, with GameJSON being faster in every category.
+These are the performance test results. As a summary, this behaves significantly faster than Newtonsoft in most cases except when serializing data for the second time. This is most likely because GameJSON does absolutely no type caching. Most importantly though, GameJSON manually deserializes JSON 12x faster than Newtonsoft with a cold cache (first run) and 4x faster with a hot cache (second run). This means that files or server messages can be loaded with GameJSON in games without incurring a huge frame spike. 
 
 ## Tests
 I created an object `TestPositions` with a `string` and a `Vector3`, and had each library serialize and deserialize these objects.
-* Windows - i5-9600K with Mono backend
-* Android - Galaxy S10 Lite with IL2CPP backend
+* Windows - i7-12700H
 
 ### 1000 Test Positions Cold Platform
 This captures the first run of serializing/deserializing 1000 `TestPositions` on the respective Platform
@@ -33,13 +30,5 @@ This captures the first run of serializing/deserializing 1000 `TestPositions` on
 This captures the second run of serializing/deserializing of 1000 `TestPosition` on the respective Platform
 
 ### Results
-| TestName                               | 1000 TestPositions Cold Windows | 1000 TestPositions Hot Windows  | 1000 TestPositions Cold Android | 1000 TestPositions Hot Android |
-| -------------------------------------- | ------------------------------- | ------------------------------- | ------------------------------- | ------------------------------ |
-| GameJSON Reflection Serialize          | 14ms                            | 12ms                            | 58ms                            | 24ms                           |
-| GameJSON Reflection Deserialize        | 23ms                            | 17ms                            | 106ms                           | 35ms                           |
-| Newtonsoft Serialize                   | 142ms                           | 11ms                            | 452ms                           | 39ms                           |
-| Newtonsoft Deserialize                 | 180ms                           | 30ms                            | 577ms                           | 98ms                           |
-| GameJSON Manual Serialize              | 7ms                             | 4ms                             | 10ms                            | 9ms                            |
-| GameJSON Manual Deserialize            | 5ms                             | 2ms                             | 3ms                             | 2ms                            |
-| Newtonsoft Manual Serialize            | 79ms                            | 5ms                             | 19ms                            | 13ms                           |
-| Newtonsoft Manual Deserialize          | 95ms                            | 11ms                            | 30ms                            | 21ms                           |
+![NewtonsoftVsGameJSON](https://user-images.githubusercontent.com/10680328/200100034-912e6142-5a72-4e3a-913f-5c4b49fbff0d.png)
+
