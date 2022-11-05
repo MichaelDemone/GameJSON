@@ -7,13 +7,20 @@ public class ManualPerformance
 {
     public static void Start()
     {
-        Console.WriteLine("Starting manual cold test");
-        RunSerializationTest();
-        Console.WriteLine("Starting manual hot test");
-        RunSerializationTest();
+        var data = GetData();
+
+        Console.WriteLine("\nGame Json manual cold test");
+        RunGameJSONTest(data);
+        Console.WriteLine("\nGame Json manual hot test");
+        RunGameJSONTest(data);
+
+        Console.WriteLine("\nNewtonsoft manual cold test");
+        RunNetwtonsoftTest(data);
+        Console.WriteLine("\nNewtonsoft manual hot test");
+        RunNetwtonsoftTest(data);
     }
 
-    public static void RunSerializationTest()
+    public static List<TestPosition> GetData()
     {
         List<TestPosition> testPositions = new List<TestPosition>();
         Random r = new Random(1);
@@ -26,7 +33,11 @@ public class ManualPerformance
             });
         }
         GC.Collect();
+        return testPositions;
+    }
 
+    public static void RunGameJSONTest(List<TestPosition> positions)
+    {
         JSONSettings settings = new JSONSettings()
         {
             CustomSerializers = new Dictionary<Type, IJSONSerialize>()
@@ -42,14 +53,12 @@ public class ManualPerformance
         Stopwatch sw = new Stopwatch();
         string gameJsonSerializeString;
         {
-            
             sw.Start();
 
-
-            gameJsonSerializeString = JSON.Serialize(testPositions, settings);
+            gameJsonSerializeString = JSON.Serialize(positions, settings);
 
             sw.Stop();
-            Console.WriteLine($"Manual parsing took {sw.ElapsedTicks} ticks");
+            Console.WriteLine($"Manual serializing took {sw.ElapsedTicks} ticks");
 
             sw.Reset();
             GC.Collect();
@@ -67,7 +76,11 @@ public class ManualPerformance
             sw.Reset();
             GC.Collect();
         }
+    }
 
+    public static void RunNetwtonsoftTest(List<TestPosition> positions)
+    {
+        Stopwatch sw = new Stopwatch();
         JsonSerializerSettings newtonsoftSettings = new JsonSerializerSettings();
         newtonsoftSettings.Converters.Add(new ListTestPositionJSONConvert());
 
@@ -75,10 +88,10 @@ public class ManualPerformance
         {
             sw.Start();
 
-            newtonsoftSerializeResult = JsonConvert.SerializeObject(testPositions, newtonsoftSettings);
+            newtonsoftSerializeResult = JsonConvert.SerializeObject(positions, newtonsoftSettings);
 
             sw.Stop();
-            Console.WriteLine($"Manual Newtonsoft took {sw.ElapsedTicks} ticks");
+            Console.WriteLine($"Manual Newtonsoft serializing took {sw.ElapsedTicks} ticks");
         }
 
         List<TestPosition> newtonsoftDeserializationResult;
