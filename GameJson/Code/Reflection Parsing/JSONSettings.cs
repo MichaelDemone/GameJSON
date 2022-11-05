@@ -1,23 +1,9 @@
-﻿using GameJSON.ManualParsing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 
 namespace GameJSON.ReflectionParsing
 {
-    public class SerializePropertyAttribute : Attribute { }
-    public class JSONIgnoreAttribute : Attribute { }
-
-    public interface IJSONSerialize
-    {
-        void Serialize(object value, JSONWriter writer, JSONSettings settings);
-    }
-
-    public interface IJSONDeserialize
-    {
-        object Deserialize(JSONReader reader, JSONSettings settings);
-    }
-
     public class JSONSettings
     {
         public IDictionary<Type, IJSONSerialize> CustomSerializers = null;

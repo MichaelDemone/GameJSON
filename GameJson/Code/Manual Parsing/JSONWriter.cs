@@ -20,7 +20,7 @@ namespace GameJSON.ManualParsing
         }
 
         private readonly Stack<Token> requiredTokens = new Stack<Token>(50);
-        private readonly StringBuilder sb = new StringBuilder();
+        private readonly StringBuilder sb = new StringBuilder(100000);
         private Token lastToken= Token.Begin;
         private int tabNesting = 0;
 
